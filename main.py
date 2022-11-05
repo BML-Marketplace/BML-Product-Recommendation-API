@@ -86,11 +86,14 @@ async def product(product_id):
     parsed_product = json.loads(result)
     dumped_product = json.dumps(parsed_product, indent=4)
 
+    json_compatible_item_data = jsonable_encoder(parsed_product)
+    print(json_compatible_item_data)
+
     # print(json_list)
     print("===================================== *** ", product_id, " *** =======================================")
     print(dumped_product)
 
-    return {result}
+    return json_compatible_item_data
 
 
 @app.get("/api/products/similar-product/{product_id}", response_model=List[Product], response_model_exclude_unset=True)

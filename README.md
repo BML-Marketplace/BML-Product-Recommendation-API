@@ -23,11 +23,14 @@ you must activate the virtual environment using source venv/bin/activate.
 #### Activate the Virtual Environment in Windows Users
     venv\Scripts\activate 
 
-#### Activate the Virtual Environment in Mac OS users
+#### Activate the Virtual Environment in macOS users
     source venv/bin/activate
 
 ## 3. Install your requirements
     pip install -r requirements.txt
 
-## 4. Run the application
+## 4. Run app.y
+    python app.y
+
+## 5. Run the application
     python manage.py runserver 8080

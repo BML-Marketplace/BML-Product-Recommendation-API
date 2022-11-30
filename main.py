@@ -100,27 +100,39 @@ async def product(product_id):
 async def similar_products(product_id):
     try:
         product_id = int(product_id)
+        threshold = 0.6
         cosine_scores = util.cos_sim(model.encode(subset[subset["ProductID"] == product_id]["Feature_Set"].values[0]),
                                      sentence_embeddings)
+
         score = cosine_scores[0].tolist()
         recommended_products = []
-        for i in range(0, 31):
+        recommended_product_score_pairs = []
+        for i in range(0, 151):
             max_score = score.index(max(score))
-            recommended_products.append(subset['ProductID'][max_score])
+            recommended_product_score_pairs.append({'ProductID': subset['ProductID'][max_score],
+                                                   'Score': cosine_scores[0][i].item()})
             score[max_score] = -1
 
-        recommended_products.remove(product_id)
+        # Sort by Scores
+        recommended_product_score_pairs = sorted(recommended_product_score_pairs, key=lambda x: x['Score'], reverse=True)
+
+        for prod in recommended_product_score_pairs:
+            if prod['Score'] >= threshold and prod['ProductID'] != product_id:
+                recommended_products.append(prod['ProductID'])
+
         products_df = dataframe[dataframe["ProductID"].isin(recommended_products)]
         result = products_df.to_json(orient='records')
         parsed_products = json.loads(result)
-        dumped_products = json.dumps(parsed_products, indent=4)
 
         print("==================================================== "
               "Recommendation Based on Product with ID: ", product_id,
               " ====================================================")
         print("Product ID: ", product_id)
-        print("Similar Products ID: ", recommended_products)
-        print("Similar Products: \n", dumped_products)
+        print("Threshold: ", threshold)
+        print("Pair of Similar Product ID and Similarity Score: ", recommended_product_score_pairs)
+        print("Similar Products ID with Similarity Score greater or equal to ", threshold, ": ")
+        print(recommended_products)
+
         print("========================================================================== "
               "The END "
               "==========================================================================")
